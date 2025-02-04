@@ -87,6 +87,8 @@ func run() error {
 		for j := i - 1; j >= 0; j-- {
 			if p+len(line) < len(lines[j]) && lines[j][p:p+len(line)] == tab {
 				lines[j] = lines[j][:p] + line + lines[j][p+len(line):]
+			} else {
+				break
 			}
 		}
 	}
