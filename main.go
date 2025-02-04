@@ -15,8 +15,9 @@ var resources embed.FS
 
 var (
 	root            = flag.String("r", ".", "Root")
-	onlyDirectories = flag.Bool("d", false, "only directories")
-	all             = flag.Bool("a", false, "all files")
+	onlyDirectories = flag.Bool("d", false, "Only directories")
+	all             = flag.Bool("a", false, "All files")
+	comment         = flag.Bool("c", false, "Add a comment prefix on each line")
 )
 
 const (
@@ -34,7 +35,7 @@ func run() error {
 	startDir := common.CleanPath(*root)
 
 	lines := []string{}
-	common.WalkFiles(filepath.Join(startDir, "*"), true, true, func(path string, fi os.FileInfo) error {
+	err := common.WalkFiles(filepath.Join(startDir, "*"), true, true, func(path string, fi os.FileInfo) error {
 		if *onlyDirectories && !fi.IsDir() {
 			return nil
 
@@ -68,6 +69,11 @@ func run() error {
 		return nil
 	})
 
+	if common.Error(err) {
+		return err
+	}
+
+	mx := 0
 	for i := 0; i < len(lines); i++ {
 		p := strings.Index(lines[i], connector)
 		if p == -1 {
@@ -91,10 +97,20 @@ func run() error {
 				break
 			}
 		}
+
+		mx = common.Max(mx, len(lines[i]))
 	}
 
-	fmt.Printf("%s\n", strings.Join(lines, "\n"))
+	format := fmt.Sprintf("%%-%ds//\n", mx+3)
 
+	for i := range lines {
+		if *comment {
+			fmt.Printf(format, lines[i])
+		} else {
+			fmt.Printf("%s\n", strings.Join(lines, "\n"))
+		}
+
+	}
 	return nil
 }
 
