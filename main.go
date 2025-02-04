@@ -18,6 +18,7 @@ var (
 	onlyDirectories = flag.Bool("d", false, "Only directories")
 	all             = flag.Bool("a", false, "All files")
 	comment         = flag.Bool("c", false, "Add a comment prefix on each line")
+	indent          = flag.Int("i", 0, "Indent each line")
 )
 
 const (
@@ -53,12 +54,15 @@ func run() error {
 		level := strings.Count(path[len(startDir):], "/") + strings.Count(path, "\\")
 
 		sb := strings.Builder{}
+
+		sb.WriteString(strings.Repeat(" ", *indent))
+
 		switch level {
 		case 0:
 		case 1:
 			sb.WriteString(connector)
 		default:
-			sb.WriteString(strings.Repeat(tab, level-2))
+			sb.WriteString(strings.Repeat(tab, level-1))
 			sb.WriteString(connector)
 		}
 
@@ -103,11 +107,11 @@ func run() error {
 
 	format := fmt.Sprintf("%%-%ds//\n", mx+3)
 
-	for i := range lines {
+	for i := range len(lines) {
 		if *comment {
 			fmt.Printf(format, lines[i])
 		} else {
-			fmt.Printf("%s\n", strings.Join(lines, "\n"))
+			fmt.Printf("%s\n", lines[i])
 		}
 
 	}
