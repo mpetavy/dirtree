@@ -14,7 +14,7 @@ import (
 var resources embed.FS
 
 var (
-	root            = flag.String("r", ".", "Root")
+	files           = flag.String("f", ".", "Root")
 	onlyDirectories = flag.Bool("d", false, "Only directories")
 	all             = flag.Bool("a", false, "All files")
 	comment         = flag.Bool("c", false, "Add a comment prefix on each line")
@@ -33,10 +33,16 @@ func init() {
 }
 
 func run() error {
-	startDir := common.CleanPath(*root)
+	startDir := common.CleanPath(*files)
+	mask := "*"
+
+	if !common.IsDirectory(startDir) {
+		mask = filepath.Base(startDir)
+		startDir = filepath.Dir(startDir)
+	}
 
 	lines := []string{}
-	err := common.WalkFiles(filepath.Join(startDir, "*"), true, true, func(path string, fi os.FileInfo) error {
+	err := common.WalkFiles(filepath.Join(startDir, mask), true, true, func(path string, fi os.FileInfo) error {
 		if *onlyDirectories && !fi.IsDir() {
 			return nil
 
