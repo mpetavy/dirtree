@@ -2,7 +2,7 @@ module dirtree
 
 go 1.23.5
 
-require github.com/mpetavy/common v1.10.24
+require github.com/mpetavy/common v1.10.27
 
 require (
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
